@@ -4,7 +4,7 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
 
 /** @type {import('webpack').Configuration} */
-export default (envs) => ({
+export default {
   entry: path.resolve(process.cwd(), "src/main.tsx"),
   output: {
     publicPath: "auto",
@@ -29,38 +29,11 @@ export default (envs) => ({
       "@img": path.resolve(process.cwd(), "public/assets/img/"),
     },
     extensions: [".js", ".jsx", ".ts", ".tsx"],
+    fallback: {
+      "app1/Routes": false,
+    },
   },
   plugins: [
-    new webpack.container.ModuleFederationPlugin({
-      name: envs.APP_TITLE,
-      filename: "remoteEntry.js",
-      remotes: {
-        app1: "app1@http://localhost:3001/remoteEntry.js",
-      },
-      exposes: {
-        "./shareStates": "./src/states/shareStates",
-        // "./i18n": "./src/i18n/config",
-      },
-      shared: {
-        react: {
-          singleton: true,
-          requiredVersion: "^18.3.1",
-        },
-        "react-dom": {
-          singleton: true,
-          requiredVersion: "^18.3.1",
-        },
-        "react-router-dom": {
-          singleton: true,
-        },
-        i18next: {
-          singleton: true,
-        },
-        "react-i18next": {
-          singleton: true,
-        },
-      },
-    }),
     new HtmlWebpackPlugin({
       template: "index.html",
       publicPath: "/",
@@ -70,4 +43,4 @@ export default (envs) => ({
     }),
     new CleanWebpackPlugin(),
   ],
-});
+};

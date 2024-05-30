@@ -16,7 +16,7 @@ const remoteApp1Routes = await import("app1/Routes").then(
   (module) => module,
   () => remoteUnconnected
 );
-console.log(remoteApp1Routes);
+console.log(remoteApp1Routes, remoteApp1Routes.routes);
 export const routes = [
   {
     path: "/",
@@ -32,7 +32,7 @@ export const routes = [
       },
       {
         path: "app1",
-        children: remoteApp1Routes.routes,
+        children: remoteApp1Routes.routes ?? remoteUnconnected,
       },
     ],
   },

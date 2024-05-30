@@ -3,22 +3,10 @@ import common from "./webpack.common.js";
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import DotenvWebpack from "dotenv-webpack";
 import path from "path";
-import Dotenv from "dotenv";
-import DotenvExpand from "dotenv-expand";
 
 /** @type {import('webpack').Configuration} */
 export default () => {
-  const envs = DotenvExpand.expand(
-    Dotenv.config({
-      path: [
-        path.resolve(process.cwd(), ".env"),
-        path.resolve(process.cwd(), ".env,dev"),
-      ],
-      override: true,
-    })
-  );
-
-  return merge(common(envs.parsed), {
+  return merge(common, {
     mode: "development",
     devServer: {
       hot: true, // hot reloading
@@ -36,15 +24,11 @@ export default () => {
         {
           test: /\.(ts|tsx|js|jsx)$/,
           exclude: /node_modules/,
-          use: [
-            {
-              loader: "babel-loader",
-              options: {
-                plugins: ["react-refresh/babel"],
-              },
-            },
-            "ts-loader",
-          ],
+          loader: "esbuild-loader",
+          options: {
+            target: "ESNext",
+            tsconfig: path.resolve(process.cwd(), "tsconfig.json"),
+          },
         },
         {
           test: /\.css$/i,

@@ -9,11 +9,11 @@ import "./style/index.css";
 
 const router = createBrowserRouter(routes);
 
-// React.lazy(() =>
-//   import("portal/i18n").catch(() =>
-//     console.log("i18n from portal is not ready.")
-//   )
-// );
+React.lazy(() =>
+  import("portal/i18n").catch(() =>
+    console.log("i18n from portal is not ready.")
+  )
+);
 
 ReactDom.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

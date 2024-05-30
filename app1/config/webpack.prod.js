@@ -1,8 +1,9 @@
 import { merge } from "webpack-merge";
 import common from "./webpack.common.js";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import path from "path";
+import webpack from "webpack";
+import { EsbuildPlugin } from "esbuild-loader";
 import Dotenv from "dotenv";
 import DotenvExpand from "dotenv-expand";
 import DotenvWebpack from "dotenv-webpack";
@@ -15,21 +16,24 @@ export default ({ TARGET_ENV }) => {
       ? path.resolve(process.cwd(), `.env.${TARGET_ENV}`)
       : "";
 
-  const envs = DotenvExpand.expand(
+  DotenvExpand.expand(
     Dotenv.config({
       path: [defaultEnvPath, targetEnvPath],
       override: true,
     })
   );
 
-  return merge(common(envs.parsed), {
+  return merge(common, {
     mode: "production",
     module: {
       rules: [
         {
           test: /\.(ts|tsx|js|jsx)$/,
           exclude: /node_modules/,
-          use: ["babel-loader"],
+          loader: "esbuild-loader",
+          options: {
+            target: "ESNext",
+          },
         },
         {
           test: /\.css$/i,
@@ -38,6 +42,36 @@ export default ({ TARGET_ENV }) => {
       ],
     },
     plugins: [
+      new webpack.container.ModuleFederationPlugin({
+        name: process.env.APP_TITLE,
+        filename: "remoteEntry.js",
+        remotes: {
+          portal: "portal@http://localhost:3000/remoteEntry.js",
+        },
+        exposes: {
+          "./Routes": "./src/routes",
+        },
+        shared: {
+          react: {
+            singleton: true,
+            requiredVersion: "^18.3.1",
+          },
+          "react-dom": {
+            singleton: true,
+            requiredVersion: "^18.3.1",
+          },
+          "react-router-dom": {
+            singleton: true,
+          },
+          jotai: {},
+          i18next: {
+            singleton: true,
+          },
+          "react-i18next": {
+            singleton: true,
+          },
+        },
+      }),
       new MiniCssExtractPlugin(),
       new DotenvWebpack({
         defaults: defaultEnvPath,
@@ -47,7 +81,12 @@ export default ({ TARGET_ENV }) => {
       }),
     ],
     optimization: {
-      minimizer: [new CssMinimizerPlugin()],
+      minimizer: [
+        new EsbuildPlugin({
+          target: "ESNext", // Syntax to transpile to (see options below for possible values)
+          css: true,
+        }),
+      ],
     },
     performance: {
       hints: false,
