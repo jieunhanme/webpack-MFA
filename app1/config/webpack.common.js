@@ -14,16 +14,12 @@ export default (envs) => ({
     rules: [
       {
         test: /\.(jpg|jpeg|gif|png|svg|ico)?$/,
-        use: [
-          {
-            loader: "url-loader",
-            options: {
-              limit: 5000,
-              fallback: "file-loader",
-              name: "image/[name].[ext]",
-            },
+        type: "asset",
+        parser: {
+          dataUrlCondition: {
+            maxSize: 5 * 1024, // 기준을 5KB 로 변경
           },
-        ],
+        },
       },
     ],
   },
@@ -32,7 +28,7 @@ export default (envs) => ({
       "@src": path.resolve(process.cwd(), "src/"),
       "@img": path.resolve(process.cwd(), "public/assets/img/"),
     },
-    extensions: [".js", "jsx", ".ts", ".tsx"],
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
   plugins: [
     new webpack.container.ModuleFederationPlugin({
@@ -47,28 +43,21 @@ export default (envs) => ({
       shared: {
         react: {
           singleton: true,
-          // requiredVersion: "18.3.1",
+          requiredVersion: "^18.3.1",
         },
         "react-dom": {
           singleton: true,
-          // requiredVersion: "18.3.1",
+          requiredVersion: "^18.3.1",
         },
-        // "react@^18.3.1": {
-        //   singleton: true,
-        // },
-        // "react-dom@^18.3.1": {
-        //   singleton: true,
-        // },
         "react-router-dom": {
           singleton: true,
         },
-        jotai: {},
-        // i18next: {
-        //   singleton: true,
-        // },
-        // "react-i18next": {
-        //   singleton: true,
-        // },
+        i18next: {
+          singleton: true,
+        },
+        "react-i18next": {
+          singleton: true,
+        },
       },
     }),
     new HtmlWebpackPlugin({ template: "index.html", publicPath: "/" }),
