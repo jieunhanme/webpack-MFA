@@ -3,7 +3,7 @@ import common from "./webpack.common.js";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import path from "path";
 import webpack from "webpack";
-import { EsbuildPlugin } from "esbuild-loader";
+// import { EsbuildPlugin } from "esbuild-loader";
 import Dotenv from "dotenv";
 import DotenvExpand from "dotenv-expand";
 import DotenvWebpack from "dotenv-webpack";
@@ -25,7 +25,8 @@ export default ({ TARGET_ENV }) => {
 
   return merge(common, {
     mode: "production",
-    devtool: "inline-source-map",
+    devtool:"source-map",
+    // devtool: "inline-source-map",
     module: {
       rules: [
         {
@@ -34,6 +35,8 @@ export default ({ TARGET_ENV }) => {
           loader: "esbuild-loader",
           options: {
             target: "ESNext",
+            legalComments: "eof", // ← 요거 중요!
+            format: "esm",        // ← federation은 ESM 포맷을 선호
           },
         },
         {
@@ -44,7 +47,8 @@ export default ({ TARGET_ENV }) => {
     },
     plugins: [
       new webpack.container.ModuleFederationPlugin({
-        name: process.env.APP_TITLE,
+        // name: process.env.APP_TITLE,
+        name: "portal",
         filename: "remoteEntry.js",
         remotes: {
           app1: "app1@http://localhost:3001/remoteEntry.js",
@@ -52,6 +56,8 @@ export default ({ TARGET_ENV }) => {
         exposes: {
           "./shareStates": "./src/states/shareStates",
           "./i18n": "./src/i18n/config",
+          "./MenuRoot": "./src/Root",
+          "./global.css": "./src/style/global.css", // CSS 파일 expose
         },
         shared: {
           react: {
@@ -83,13 +89,16 @@ export default ({ TARGET_ENV }) => {
       }),
     ],
     optimization: {
-      minimizer: [
-        new EsbuildPlugin({
-          target: "ESNext", // Syntax to transpile to (see options below for possible values)
-          css: true,
-        }),
-      ],
+      minimize: false, // 코드 압축 끄기
     },
+    // optimization: {
+    //   minimizer: [
+    //     new EsbuildPlugin({
+    //       target: "ESNext", // Syntax to transpile to (see options below for possible values)
+    //       css: true,
+    //     }),
+    //   ],
+    // },
     performance: {
       hints: false,
       maxEntrypointSize: 512000,

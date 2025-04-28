@@ -6,8 +6,8 @@ import LocaleProvider from "@src/context/LocaleProvider";
 import { routes } from "@src/routes";
 import "@src/i18n/config";
 
-import "./style/reset.css";
-import "./style/index.css";
+// import "./style/reset.css";
+// import "./style/index.css";
 
 const router = createBrowserRouter(routes);
 

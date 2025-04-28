@@ -2,7 +2,9 @@ import ReactDom from "react-dom/client";
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import { routes } from "@src/routes";
+// import { routes } from "@src/routes";
+import { routes } from "@src/test_routes";
+
 
 import "./style/reset.css";
 import "./style/index.css";
