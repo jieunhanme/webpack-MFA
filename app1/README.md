@@ -50,3 +50,42 @@ TODO
 
 2. module federation
    <%= env %>
+
+3. eslint 설정정
+   pnpm add --save-dev eslint @eslint/js typescript-eslint globals eslint-plugin-react-hooks eslint-plugin-react-refresh eslint-webpack-plugin
+
+eslint.config.js;
+
+```js
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
+
+export default tseslint.config(
+  { ignores: ["dist"] },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
+    },
+  }
+);
+```
+
+"lint": "eslint .",
+CI 구성에서, pnpm run lint가 있는지 확인 필요

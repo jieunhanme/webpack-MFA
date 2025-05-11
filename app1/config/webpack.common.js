@@ -52,7 +52,9 @@ export default ({ TARGET_ENV }) => {
       },
     },
     plugins: [
-      new HtmlWebpackPlugin({ template: "index.html", publicPath: "/" }),
+      new HtmlWebpackPlugin({ template: "index.html", publicPath: "/", chunks: ['main'], 
+        // 'remoteEntry.js'는 제외  
+        }),
       new webpack.ProvidePlugin({
         React: "react",
       }),

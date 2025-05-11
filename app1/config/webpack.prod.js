@@ -33,6 +33,8 @@ export default ({ TARGET_ENV }) => {
           loader: "esbuild-loader",
           options: {
             target: "ESNext",
+            legalComments: "eof", // ← 요거 중요!
+            format: "esm",        // ← federation은 ESM 포맷을 선호
           },
         },
         {
